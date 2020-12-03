@@ -1,0 +1,1 @@
+A Bash script to set Bing image of the day as desktop bachground.
