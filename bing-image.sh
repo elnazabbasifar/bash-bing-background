@@ -1,10 +1,9 @@
 #!/bin/zsh
 
-# $bing is needed to form the fully qualified URL for
-# the Bing pic of the day
+# $bing is needed to form the fully qualified URL for the Bing pic of the day
 bing="www.bing.com"
 
-# $xmlURL is needed to get the xml data from which
+# $url (xmlURL) is needed to get the xml data from which
 # the relative URL for the Bing pic of the day is extracted
 #
 # The mkt parameter determines which Bing market you would like to
@@ -13,58 +12,26 @@ bing="www.bing.com"
 #
 # The idx parameter determines where to start from. 0 is the current day,
 # 1 the previous day, etc.
-xmlURL="http://www.bing.com/HPImageArchive.aspx?format=xml&idx=1&n=1&mkt=en-US"
+url="http://www.bing.com/HPImageArchive.aspx?format=xml&idx=1&n=1&mkt=en-US"
 
-# $saveDir is used to set the location where Bing pics of the day
-# are stored.  $HOME holds the path of the current user's home directory
-saveDir="$HOME/Pictures/.bing-images/"
+# $save_dir is used to set the location where Bing pics of the day are stored. 
+# $HOME holds the path of the current user's home directory
+save_dir="$HOME/Pictures/.bing-images/"
 
-# Create saveDir if it does not already exist
-mkdir -p $saveDir
+# Create save_dir if it does not already exist
+mkdir -p $save_dir
 
-# Set picture options
-# Valid options are: none,wallpaper,centered,scaled,stretched,zoom,spanned
-picOpts="zoom"
+# Form the URL for the image
+image_url=$bing$(echo $(curl -s $url) | grep -oP "<url>(.*)</url>" | cut -d ">" -f 2 | cut -d "<" -f 1)
 
-# The desired Bing picture resolution to download
-# Valid options: "_1024x768" "_1280x720" "_1366x768" "_1920x1200"
-desiredPicRes="_1366x768"
+# Set imaage Name to the current date
+image_name=$(date +'%Y-%m-%d')".jpg"
 
-# The file extension 
-picExt=".jpg"
-
-# Extract the relative URL of the Bing pic of the day from
-# the XML data retrieved from xmlURL, form the fully qualified
-# URL for the pic of the day, and store it in $picURL
-
-# Form the URL for the desired pic resolution
-desiredPicURL=$bing$(echo $(curl -s $xmlURL) | grep -oP "<urlBase>(.*)</urlBase>" | cut -d ">" -f 2 | cut -d "<" -f 1)$desiredPicRes$picExt
-
-# Form the URL for the default pic resolution
-defaultPicURL=$bing$(echo $(curl -s $xmlURL) | grep -oP "<url>(.*)</url>" | cut -d ">" -f 2 | cut -d "<" -f 1)
-
-# $picName contains the filename of the Bing pic of the day
-# Set picName to the todaye's date
-picName=$(date +'%Y-%m-%d')
-
-# Attempt to download the desired image resolution. If it doesn't
-# exist then download the default image resolution
-if wget --quiet --spider "$desiredPicURL"
-then
-
-    # Download the Bing pic of the day at desired resolution
-    curl -s -o $saveDir$picName$picExt $desiredPicURL
-else
-    
-    # Download the Bing pic of the day at default resolution
-    curl -s -o $saveDir$picName$picExt $defaultPicURL 
-fi
+# Download the Bing pic of the day 
+curl -s -o $save_dir$image_name $image_url
 
 # Set the GNOME3 wallpaper
-gsettings set org.gnome.desktop.background picture-uri "file://$saveDir$picName"
-
-# Set the GNOME 3 wallpaper picture options
-gsettings set org.gnome.desktop.background picture-options $picOpts
+gsettings set org.gnome.desktop.background picture-uri "file://$save_dir$image_name"
 
 # Remove pictures older than 7 days
 #find $saveDir -atime 7 -delete
