@@ -53,11 +53,11 @@ if wget --quiet --spider "$desiredPicURL"
 then
 
     # Download the Bing pic of the day at desired resolution
-    curl -s -o $saveDir$picName $desiredPicURL
+    curl -s -o $saveDir$picName$picExt $desiredPicURL
 else
     
     # Download the Bing pic of the day at default resolution
-    curl -s -o $saveDir$picName $defaultPicURL
+    curl -s -o $saveDir$picName$picExt $defaultPicURL 
 fi
 
 # Set the GNOME3 wallpaper
