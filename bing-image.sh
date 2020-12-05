@@ -30,7 +30,7 @@ picOpts="zoom"
 # Valid options: "_1024x768" "_1280x720" "_1366x768" "_1920x1200"
 desiredPicRes="_1366x768"
 
-# The file extension for the Bing pic
+# The file extension 
 picExt=".jpg"
 
 # Extract the relative URL of the Bing pic of the day from
